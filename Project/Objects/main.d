@@ -18,3 +18,5 @@
 .\objects\main.o: usbcore.h
 .\objects\main.o: usbaudio.h
 .\objects\main.o: type.h
+.\objects\main.o: cat.h
+.\objects\main.o: tree.h

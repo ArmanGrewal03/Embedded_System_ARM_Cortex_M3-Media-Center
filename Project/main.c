@@ -136,25 +136,25 @@ int gallery_counter = 0;
 
 #if defined(IMG0_DATA)
 if (gallery_index == gallery_counter++) {
-    GLCD_Bitmap(0, 0, IMG0_W, IMG0_H, (const unsigned char*)IMG0_DATA);
+    GLCD_Bitmap(0, 0, IMG0_W, IMG0_H, (unsigned char*)IMG0_DATA);
 }
 #endif
 
 #if defined(IMG1_DATA)
 if (gallery_index == gallery_counter++) {
-    GLCD_Bitmap(0, 0, IMG1_W, IMG1_H, (const unsigned char*)IMG1_DATA);
+    GLCD_Bitmap(0, 0, IMG1_W, IMG1_H, (unsigned char*)IMG1_DATA);
 }
 #endif
 
 #if defined(IMG2_DATA)
 if (gallery_index == gallery_counter++) {
-    GLCD_Bitmap(0, 0, IMG2_W, IMG2_H, (const unsigned char*)IMG2_DATA);
+    GLCD_Bitmap(0, 0, IMG2_W, IMG2_H, (unsigned char*)IMG2_DATA);
 }
 #endif
 
 #if defined(IMG3_DATA)
 if (gallery_index == gallery_counter++) {
-    GLCD_Bitmap(0, 0, IMG3_W, IMG3_H, (const unsigned char*)IMG3_DATA);
+    GLCD_Bitmap(0, 0, IMG3_W, IMG3_H, (unsigned char*)IMG3_DATA);
 }
 #endif
 
