@@ -1,0 +1,20 @@
+--cpu Cortex-M3
+".\objects\kbd.o"
+".\objects\glcd_spi_lpc1700.o"
+".\objects\main.o"
+".\objects\usbcore.o"
+".\objects\usbdesc.o"
+".\objects\usbhw.o"
+".\objects\usbuser.o"
+".\objects\adcuser.o"
+".\objects\adc_mcb1700.o"
+".\objects\led_mcb1700.o"
+".\objects\eventrecorder.o"
+".\objects\gpio_lpc17xx.o"
+".\objects\pin_lpc17xx.o"
+".\objects\startup_lpc17xx.o"
+".\objects\system_lpc17xx.o"
+--library_type=microlib --strict --scatter ".\Objects\Bitband.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\Bitband.map" -o .\Objects\Bitband.axf

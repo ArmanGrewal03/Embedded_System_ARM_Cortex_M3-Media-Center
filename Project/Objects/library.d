@@ -1,0 +1,17 @@
+.\objects\library.o: library.c
+.\objects\library.o: GLCD.h
+.\objects\library.o: KBD.h
+.\objects\library.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include\LPC17xx.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include\core_cm3.h
+.\objects\library.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include\cmsis_version.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include\cmsis_compiler.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include\cmsis_armcc.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include\mpu_armv7.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\Keil\LPC1700_DFP\2.7.2\Device\Include\system_LPC17xx.h
+.\objects\library.o: C:\Users\arman\AppData\Local\Arm\Packs\Keil\MDK-Middleware\7.13.0\Board\Board_ADC.h
+.\objects\library.o: image.c
+.\objects\library.o: image2.c
+.\objects\library.o: image3.c
+.\objects\library.o: menu.h
