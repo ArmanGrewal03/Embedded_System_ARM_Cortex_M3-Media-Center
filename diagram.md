@@ -1,62 +1,57 @@
 ```mermaid
-flowchart TD
+flowchart TB
 
-  %% ==== USER INPUTS ====
-  subgraph USER["User Inputs"]
-    KBD_IN["Joystick / KBD"]
-    POT_IN["Potentiometer"]
+  %% ========== INPUT SIDE ==========
+  subgraph INPUTS["User & External Inputs"]
+    KBD["Joystick / KBD"]
+    POT["Potentiometer"]
+    USB_HOST_IN["USB Host (PC)"]
   end
 
-  %% ==== MCU CORE ====
-  subgraph MCU["LPC17xx Microcontroller"]
+  %% ========== CORE MCU ==========
+  subgraph CORE["LPC17xx Microcontroller"]
     
-    %% Application layer
-    subgraph APPS["Application Layer"]
-      MAIN["main.c"]
-      MENU["menu.c (Main menu)"]
-      GALLERY["gallery.c (Photo Gallery)"]
-      PLAYER["player.c (MP3 Player)"]
-      FLAPPY["flappy.c (Flappy Bird Game)"]
+    subgraph APP["Application Code"]
+      MAIN_MENU["main.c / menu.c"]
+      GALLERY["gallery.c\n(Photo Gallery)"]
+      PLAYER["player.c\n(MP3 Player)"]
+      FLAPPY["flappy.c\n(Flappy Bird Game)"]
     end
 
-    %% Drivers & middleware
-    subgraph DRV["Drivers / Middleware"]
-      GLCD_DRV["GLCD driver"]
-      KBD_DRV["KBD driver"]
-      ADC_DAC["ADC / DAC"]
-      TIMER0["Timer0 (audio ISR)"]
-      USB_STACK["USB audio stack"]
-    end
+    DRIVERS["Drivers & Middleware\nGLCD, KBD, ADC, DAC, Timer0, USB audio stack"]
 
   end
 
-  %% ==== HARDWARE OUTPUTS ====
-  DISP["GLCD Screen"]
-  USB_HOST["USB Host (PC)"]
-  SPK["Speaker / Headphones"]
+  %% ========== OUTPUT SIDE ==========
+  subgraph OUTPUTS["Hardware Outputs"]
+    GLCD["GLCD Display"]
+    SPK["Speaker / Headphones"]
+    USB_HOST_OUT["USB Connection to PC"]
+  end
 
-  %% ==== CONNECTIONS ====
+  %% ===== CONNECTIONS =====
 
-  %% User inputs into MCU drivers
-  USER --> KBD_DRV
-  USER --> ADC_DAC
+  %% Inputs into core
+  KBD --> MAIN_MENU
+  KBD --> FLAPPY
+  KBD --> GALLERY
+  KBD --> PLAYER
 
-  %% Main flow
-  MAIN --> MENU
-  MENU --> GALLERY
-  MENU --> PLAYER
-  MENU --> FLAPPY
+  POT --> DRIVERS
+  USB_HOST_IN --> DRIVERS
 
-  %% Apps using drivers/middleware
-  GALLERY --> GLCD_DRV
-  FLAPPY --> GLCD_DRV
+  %% App to drivers
+  MAIN_MENU --> GALLERY
+  MAIN_MENU --> PLAYER
+  MAIN_MENU --> FLAPPY
 
-  PLAYER --> USB_STACK
-  PLAYER --> TIMER0
-  TIMER0 --> ADC_DAC
+  GALLERY --> DRIVERS
+  PLAYER --> DRIVERS
+  FLAPPY --> DRIVERS
 
-  %% Drivers to external hardware
-  GLCD_DRV --> DISP
-  USB_STACK --> USB_HOST
-  ADC_DAC --> SPK
+  %% Drivers to outputs
+  DRIVERS --> GLCD
+  DRIVERS --> SPK
+  DRIVERS --> USB_HOST_OUT
+
 ```
