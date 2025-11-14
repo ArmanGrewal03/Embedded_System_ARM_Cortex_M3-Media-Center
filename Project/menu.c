@@ -11,7 +11,7 @@
 
 static void menu_footer(int selected, int total){
   char f[32];
-  snprintf(f, sizeof(f), "UP/DOWN  SELECT   %d/%d", selected + 1, total);
+  snprintf(f, sizeof(f), "UP/DOWN  SELECT  %d", selected + 1);
   GLCD_SetBackColor(White);
   GLCD_SetTextColor(Black);
   GLCD_ClearLn(8, 1);
@@ -22,7 +22,7 @@ void initMenu(void){
   GLCD_Clear(White);
   GLCD_SetBackColor(Blue);
   GLCD_SetTextColor(White);
-  GLCD_DisplayString(0, 0, __FI, (unsigned char*)"     Menu    ");
+  GLCD_DisplayString(0, 0, __FI, (unsigned char*)"     Menu                                                                 ");
   GLCD_SetBackColor(White);
   GLCD_SetTextColor(Black);
 }
