@@ -20,7 +20,7 @@
 extern void SystemClockUpdate(void);
 extern uint32_t SystemFrequency;
 
-/* --- Audio globals expected by Keil USB audio stack (like usbdmain.c) --- */
+/* --- Audio globals expected by Keil USB audio stack (like usbmain.c) --- */
 uint8_t  Mute;          /* Mute state */
 uint32_t Volume;        /* Volume level used in ISR */
 
@@ -41,45 +41,12 @@ uint32_t Tick;
 
 extern uint16_t VolCur; /* from adcuser.c */
 
-/* latest volume percentage for UI (written in ISR, read in main loop) */
+/* Volume percentage for UI (written in ISR, read in main loop) */
 static volatile uint8_t ui_vol_pct = 0;
 
-/* ---------- UI helpers (match style of Gallery) ---------- */
-
-static void ui_header(const char* title){
-  GLCD_SetBackColor(Blue);
-  GLCD_SetTextColor(Yellow);
-  GLCD_ClearLn(0, 1);
-  GLCD_DisplayString(0, 0, __FI, (unsigned char*)title);
-  GLCD_SetBackColor(White);
-  GLCD_SetTextColor(Black);
-}
-
-static uint8_t last_vol_pct = 255;
-
-static void draw_volume_ui(uint8_t vol_pct){
-  if (vol_pct == last_vol_pct) return;
-  last_vol_pct = vol_pct;
-
-  /* Title/header line */
-  ui_header("MP3 Player   <SELECT to Back>");
-
-  /* Info + bar graph */
-  GLCD_DisplayString(2, 0, 1, (unsigned char*)"USB Audio: CONNECTED        ");
-  GLCD_DisplayString(3, 0, 1, (unsigned char*)"Volume (pot):               ");
-
-  char buf[16];
-  sprintf(buf, "%3u%%", vol_pct);
-  GLCD_DisplayString(3, 16, 1, (unsigned char*)buf);
-
-  GLCD_Bargraph(20, 5*16, 280, 16, vol_pct);
-
-  GLCD_DisplayString(9, 0, 1,
-    (unsigned char*)"Use POT for volume   SELECT: Back");
-}
-
-/* ---------- Potentiometer read (AIN2 on P0.25) ---------- */
-
+/* ============================================================
+   Potentiometer: read AIN2 (P0.25) into PotVal
+   ============================================================ */
 static void get_potval(void){
   uint32_t val;
 
@@ -94,8 +61,53 @@ static void get_potval(void){
            ((val >> 7) & 0x08);
 }
 
-/* ---------- Timer0 ISR: audio + pot/volume (NO GLCD here) ---------- */
+/* ============================================================
+   Small splash screen
+   ============================================================ */
+static void show_splash_screen(void){
+  GLCD_Clear(Blue);
+  GLCD_SetBackColor(Blue);
+  GLCD_SetTextColor(White);
 
+  GLCD_DisplayString(3, 2, __FI, (unsigned char*)"  USB MP3 Player  ");
+  GLCD_DisplayString(5, 4, __FI, (unsigned char*)"   Loading...   ");
+
+  /* short delay */
+  for (volatile uint32_t d = 0; d < 150000; d++) {
+    __NOP();
+  }
+}
+
+/* ============================================================
+   Simple volume UI: just a number, no bar
+   ============================================================ */
+static uint8_t last_vol_pct = 255;
+
+static void draw_volume_ui(uint8_t vol_pct){
+  if (vol_pct == last_vol_pct) return;
+  last_vol_pct = vol_pct;
+
+  GLCD_Clear(White);
+
+  GLCD_SetBackColor(Blue);
+  GLCD_SetTextColor(Yellow);
+  GLCD_DisplayString(0, 0, __FI, (unsigned char*)"  MP3 Player (USB)  ");
+  GLCD_SetBackColor(White);
+  GLCD_SetTextColor(Black);
+
+  GLCD_DisplayString(2, 0, 1, (unsigned char*)"USB Audio: CONNECTED");
+  GLCD_DisplayString(4, 0, 1, (unsigned char*)"Volume (POT):");
+
+  char buf[16];
+  sprintf(buf, "%3u%%", vol_pct);
+  GLCD_DisplayString(4, 14, 1, (unsigned char*)buf);
+
+  GLCD_DisplayString(7, 0, 1, (unsigned char*)"SELECT = Exit");
+}
+
+/* ============================================================
+   TIMER0 IRQ: audio out + pot/volume update (NO GLCD here)
+   ============================================================ */
 void TIMER0_IRQHandler(void){
   long      val;
   uint32_t  cnt;
@@ -122,11 +134,11 @@ void TIMER0_IRQHandler(void){
     val = 0x8000;
   }
 
-  /* write to DAC (using DACR from your header) */
+  /* write to DAC */
   LPC_DAC->DACR = val & 0xFFC0;
 
   /* every 1024th tick (~31 Hz @ 32 kHz sample rate):
-     update pot, volume, and export a UI volume percentage */
+     update pot, Volume, and ui_vol_pct */
   if ((Tick++ & 0x03FF) == 0) {
     get_potval();
 
@@ -137,47 +149,42 @@ void TIMER0_IRQHandler(void){
       Volume = VolCur * PotVal;
     }
 
-    long vu = (long)(VUM >> 20);   /* VU meter scale (not drawn here, but kept) */
+    long vu = (long)(VUM >> 20);   /* VU meter (not displayed here) */
     VUM = 0;
     if (vu > 7) vu = 7;
 
-    /* map pot (0..~255) to 0..100% for bar graph */
-    uint32_t pot_raw = PotVal & 0x3FF;  /* mask to 10 bits just in case */
+    /* map pot (0..~255) to 0..100% for UI */
+    uint32_t pot_raw = PotVal & 0x3FF;  /* 0..1023 */
     ui_vol_pct = (uint8_t)((pot_raw * 100U) / 1023U);
   }
 
   LPC_TIM0->IR = 1;                /* clear interrupt flag */
 }
 
-/* ---------- Main "MP3 player" mode (Gallery-style joystick) ---------- */
-
+/* ============================================================
+   Main MP3 Player mode
+   ============================================================ */
 void runMusicPlayer(void){
   volatile uint32_t pclkdiv, pclk;
 
-  GLCD_Clear(White);
-  ui_header("MP3 Player   <SELECT to Back>");
+  /* 1) Splash screen */
+  show_splash_screen();
 
-  GLCD_DisplayString(1, 0, 1,
-    (unsigned char*)"Waiting for USB audio stream...");
-  GLCD_DisplayString(9, 0, 1,
-    (unsigned char*)"Use POT for volume   SELECT: Back");
-
-  /* System clock setup */
+  /* 2) System clock update */
   SystemClockUpdate();
 
-  /* P0.25 = AD0.2 (pot), P0.26 = AOUT (DAC) */
+  /* 3) ADC + DAC pins: P0.25 = AD0.2, P0.26 = AOUT */
   LPC_PINCON->PINSEL1 &= ~((0x03<<18)|(0x03<<20));
   LPC_PINCON->PINSEL1 |=  ((0x01<<18)|(0x02<<20));
 
-  /* enable ADC peripheral clock */
+  /* 4) Enable ADC peripheral clock */
   LPC_SC->PCONP |= (1 << 12);
 
-  /* ADC: 10-bit, AIN2 @ 4MHz (matches Keil demo settings) */
-  LPC_ADC->ADCR  = 0x00200E04;
-  /* DAC mid point */
-  LPC_DAC->DACR  = 0x00008000;
+  /* 5) ADC & DAC setup (same as Keil USB audio example) */
+  LPC_ADC->ADCR  = 0x00200E04;             /* ADC: 10-bit AIN2 @ 4MHz    */
+  LPC_DAC->DACR  = 0x00008000;             /* DAC mid point              */
 
-  /* derive PCLK for TIMER0 from SystemFrequency */
+  /* 6) Timer0: 32 kHz sample rate */
   pclkdiv = (LPC_SC->PCLKSEL0 >> 2) & 0x03;
   switch (pclkdiv){
     case 0x01: pclk = SystemFrequency;    break;
@@ -187,43 +194,40 @@ void runMusicPlayer(void){
     default:   pclk = SystemFrequency/4;  break;
   }
 
-  /* 32 kHz audio sample rate (DATA_FREQ from usbaudio.h) */
   LPC_TIM0->MR0 = pclk/DATA_FREQ - 1;
   LPC_TIM0->MCR = 3;                      /* interrupt + reset on MR0   */
   LPC_TIM0->TCR = 1;                      /* enable timer               */
   NVIC_EnableIRQ(TIMER0_IRQn);
 
-  /* USB audio device init */
+  /* 7) USB init & connect (low-level handled in usbhw.c) */
   USB_Init();
   USB_Connect(TRUE);
 
-  /* initial UI */
+  /* 8) Initial UI */
   draw_volume_ui(0);
+  uint8_t last_drawn = 0;
 
-  int last_vol_drawn = -1;
-
-  /* ---- Joystick loop: replicate Gallery() behavior ---- */
+  /* 9) Main loop: joystick + volume display */
   while (1){
     uint32_t key = get_button();
 
-    /* CENTER CLICK (SELECT) = exit + disconnect, just like Gallery() */
+    /* SELECT (center click) => stop + disconnect + return to menu */
     if (key & KBD_SELECT) {
       NVIC_DisableIRQ(TIMER0_IRQn);
       NVIC_DisableIRQ(USB_IRQn);
       USB_Connect(FALSE);
-
-      GLCD_Clear(White);  /* optional: clear screen on exit */
-      return;             /* back to menu */
+      GLCD_Clear(White);
+      return;
     }
 
-    /* update the volume bar from the latest value coming from the ISR */
-    uint8_t vol_now = ui_vol_pct;
-    if (vol_now != last_vol_drawn){
-      last_vol_drawn = vol_now;
-      draw_volume_ui(vol_now);
+    /* Update volume display if changed (value fed by ISR) */
+    uint8_t v = ui_vol_pct;
+    if (v != last_drawn){
+      last_drawn = v;
+      draw_volume_ui(v);
     }
 
-    /* small debounce / update delay (similar to Gallery) */
+    /* Small debounce / update delay like your Gallery code */
     for (volatile uint32_t d = 0; d < 40000; d++) {
       __NOP();
     }
