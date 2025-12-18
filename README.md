@@ -50,12 +50,12 @@ The application is structured as a **finite state machine (FSM)** with four main
 Only one subsystem is active at a time, ensuring predictable behavior and clean resource management.
 
 ### Finite State Machine
-![Finite State Machine](<img width="1816" height="720" alt="image" src="https://github.com/user-attachments/assets/d0601cc9-186b-4503-a0bd-0fa3cb6e58d9" />
-)
+<img width="1816" height="720" alt="image" src="https://github.com/user-attachments/assets/d0601cc9-186b-4503-a0bd-0fa3cb6e58d9" />
+
 
 ### System Block Diagram
-![System Block Diagram](<img width="1784" height="1057" alt="image" src="https://github.com/user-attachments/assets/91c1c652-9c09-4327-88e9-ed8f171d3be2" />
-)
+<img width="1784" height="1057" alt="image" src="https://github.com/user-attachments/assets/91c1c652-9c09-4327-88e9-ed8f171d3be2" />
+
 
 ---
 
@@ -67,8 +67,8 @@ The menu acts as the **central controller** of the Media Center.
 - SELECT launches a module
 - Selective screen redraws improve performance and reduce flicker
 
-![Menu Screen](<img width="884" height="955" alt="image" src="https://github.com/user-attachments/assets/5815bff6-0fe3-4cc3-8fbe-4e09c3e563b1" />
-)
+<img width="884" height="955" alt="image" src="https://github.com/user-attachments/assets/5815bff6-0fe3-4cc3-8fbe-4e09c3e563b1" />
+
 
 ---
 
@@ -78,8 +78,7 @@ Displays images stored as **16-bit RGB565 C arrays**.
 - Wrap-around navigation
 - SELECT returns to menu
 
-![Photo Gallery](<img width="875" height="594" alt="image" src="https://github.com/user-attachments/assets/a0c66a5e-67b5-4045-ba42-845df996fa26" />
-)
+<img width="875" height="594" alt="image" src="https://github.com/user-attachments/assets/a0c66a5e-67b5-4045-ba42-845df996fa26" />
 
 ---
 
@@ -89,8 +88,8 @@ Streams audio from a host PC using the **USB Audio Class**.
 - Potentiometer controls volume in real time
 - Non-blocking UI updates during playback
 
-![MP3 Player](<img width="875" height="719" alt="image" src="https://github.com/user-attachments/assets/17164d0c-63aa-4d07-97a8-2dba5799efb5" />
-)
+<img width="875" height="719" alt="image" src="https://github.com/user-attachments/assets/17164d0c-63aa-4d07-97a8-2dba5799efb5" />
+
 
 ---
 
@@ -101,10 +100,9 @@ A lightweight real-time game demonstrating animation and collision detection.
 - Pipes regenerate with random gaps
 - Game Over and restart logic
 
-![Flappy Bird Gameplay](<img width="882" height="662" alt="image" src="https://github.com/user-attachments/assets/6fb5e67b-c4bc-4278-a3ff-f693e88e75a9" />
-)  
-![Flappy Bird Game Over](<img width="884" height="788" alt="image" src="https://github.com/user-attachments/assets/cde4d3eb-b6e8-4ebf-850f-1ce3e586dc1c" />
-)
+<img width="882" height="662" alt="image" src="https://github.com/user-attachments/assets/6fb5e67b-c4bc-4278-a3ff-f693e88e75a9" />
+) 
+<img width="884" height="788" alt="image" src="https://github.com/user-attachments/assets/cde4d3eb-b6e8-4ebf-850f-1ce3e586dc1c" />
 
 ---
 
